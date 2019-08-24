@@ -1,4 +1,4 @@
-package hu.forloop.springboot.web.springbootfirstwebapplication;
+package hu.forloop.springboot.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

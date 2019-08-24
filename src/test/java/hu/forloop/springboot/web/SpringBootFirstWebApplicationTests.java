@@ -1,4 +1,4 @@
-package hu.forloop.springboot.web.springbootfirstwebapplication;
+package hu.forloop.springboot.web;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

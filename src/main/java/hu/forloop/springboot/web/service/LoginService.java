@@ -1,4 +1,4 @@
-package hu.forloop.springboot.web.springbootfirstwebapplication.service;
+package hu.forloop.springboot.web.service;
 
 import org.springframework.stereotype.Service;
 

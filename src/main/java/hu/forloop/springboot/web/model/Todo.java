@@ -1,4 +1,4 @@
-package hu.forloop.springboot.web.springbootfirstwebapplication.model;
+package hu.forloop.springboot.web.model;
 
 import javax.validation.constraints.Size;
 import java.util.Date;

@@ -1,9 +1,11 @@
-package hu.forloop.springboot.web.springbootfirstwebapplication.controller;
+package hu.forloop.springboot.web.controller;
 
-import hu.forloop.springboot.web.springbootfirstwebapplication.model.Todo;
-import hu.forloop.springboot.web.springbootfirstwebapplication.service.TodoService;
+import hu.forloop.springboot.web.model.Todo;
+import hu.forloop.springboot.web.service.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -15,7 +17,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Controller
-@SessionAttributes("name")
 public class TodoContoller {
 
     @Autowired
@@ -30,13 +31,22 @@ public class TodoContoller {
 
     @RequestMapping(value = "/list-todos", method = RequestMethod.GET)
     public String showTodoList(ModelMap model) {
-        model.put("todos", todoService.retrieveTodos((String) model.get("name")));
+        model.put("todos", todoService.retrieveTodos(getLoggedInUserName()));
         return "list-todos";
     }
 
+    private String getLoggedInUserName() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            return ((UserDetails) principal).getUsername();
+        }
+        return principal.toString();
+    }
+
+
     @RequestMapping(value = "/todo", method = RequestMethod.GET)
     public String showAddTodoPage(ModelMap model) {
-        model.addAttribute("todo", new Todo(0, (String) model.get("name"), "", new Date(), false));
+        model.addAttribute("todo", new Todo(0, getLoggedInUserName(), "", new Date(), false));
         return "todo";
     }
 
@@ -47,7 +57,7 @@ public class TodoContoller {
             return "todo";
         }
 
-        todoService.addTodo((String) model.get("name"), todo.getDesc(), todo.getTargetDate(), false);
+        todoService.addTodo(getLoggedInUserName(), todo.getDesc(), todo.getTargetDate(), false);
         return "redirect:/list-todos";
     }
 
@@ -67,7 +77,7 @@ public class TodoContoller {
     @RequestMapping(value = "/update-todo", method = RequestMethod.POST)
     public String updateTodo(ModelMap model, @Valid Todo todo, BindingResult result) {
 
-        todo.setUser((String) model.get("name"));
+        todo.setUser(getLoggedInUserName());
 
         if (result.hasErrors()) {
             return "todo";
