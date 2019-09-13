@@ -1,7 +1,10 @@
 package hu.forloop.springboot.web.controller;
 
-import hu.forloop.springboot.web.model.Todo;
+import hu.forloop.springboot.web.entity.Todo;
+import hu.forloop.springboot.web.repository.TodoRepository;
 import hu.forloop.springboot.web.service.TodoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,8 +22,13 @@ import java.util.Date;
 @Controller
 public class TodoContoller {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TodoContoller.class);
+
     @Autowired
-    private TodoService todoService;
+    private TodoService service;
+
+    @Autowired
+    private TodoRepository repository;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -31,7 +39,8 @@ public class TodoContoller {
 
     @RequestMapping(value = "/list-todos", method = RequestMethod.GET)
     public String showTodoList(ModelMap model) {
-        model.put("todos", todoService.retrieveTodos(getLoggedInUserName()));
+        model.put("todos", repository.findByUser(getLoggedInUserName()));
+//        model.put("todos", service.retrieveTodos(getLoggedInUserName()));
         return "list-todos";
     }
 
@@ -52,24 +61,33 @@ public class TodoContoller {
 
     @RequestMapping(value = "/todo", method = RequestMethod.POST)
     public String addTodo(ModelMap model, @Valid Todo todo, BindingResult result) {
+        LOGGER.info("Add todo");
 
         if (result.hasErrors()) {
+            LOGGER.error("Add todo has error");
             return "todo";
         }
 
-        todoService.addTodo(getLoggedInUserName(), todo.getDesc(), todo.getTargetDate(), false);
+        todo.setUser(getLoggedInUserName());
+        todo.setDone(false);
+        repository.save(todo);
+        LOGGER.info("Todo created: " + todo.toString());
+
+//        service.addTodo(getLoggedInUserName(), todo.getDesc(), todo.getTargetDate(), false);
         return "redirect:/list-todos";
     }
 
     @RequestMapping(value = "/delete-todo", method = RequestMethod.GET)
     public String deleteTodo(@RequestParam int id) {
-        todoService.deleteTodo(id);
+        repository.deleteById(id);
+//        service.deleteTodo(id);
         return "redirect:/list-todos";
     }
 
     @RequestMapping(value = "/update-todo", method = RequestMethod.GET)
     public String showUpdateTodo(@RequestParam int id, ModelMap modelMap) {
-        Todo todo = todoService.retrieveTodo(id);
+        Todo todo = repository.findById(id).orElse(null);
+//        Todo todo = service.retrieveTodo(id);
         modelMap.put("todo", todo);
         return "todo";
     }
@@ -82,8 +100,8 @@ public class TodoContoller {
         if (result.hasErrors()) {
             return "todo";
         }
-
-        todoService.updateTodo(todo);
+        repository.save(todo);
+//        service.updateTodo(todo);
         return "redirect:/list-todos";
     }
 }

@@ -1,6 +1,6 @@
 package hu.forloop.springboot.web.service;
 
-import hu.forloop.springboot.web.model.Todo;
+import hu.forloop.springboot.web.entity.Todo;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

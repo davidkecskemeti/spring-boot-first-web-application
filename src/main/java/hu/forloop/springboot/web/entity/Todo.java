@@ -1,21 +1,31 @@
-package hu.forloop.springboot.web.model;
+package hu.forloop.springboot.web.entity;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
+@Entity
 public class Todo {
+
+    @Id
+    @GeneratedValue
     private int id;
+
     private String user;
 
     @Size(min = 10,message = "Enter atleast 10 characters")
     private String desc;
     private Date targetDate;
-    private boolean isDone;
+    private Boolean isDone;
 
-    public Todo() {
+    protected Todo() {
+        super();
     }
 
-    public Todo(int id, String user, String desc, Date targetDate, boolean isDone) {
+    public Todo(int id, String user, String desc, Date targetDate, Boolean isDone) {
+        super();
         this.id = id;
         this.user = user;
         this.desc = desc;
@@ -66,11 +76,11 @@ public class Todo {
         this.targetDate = targetDate;
     }
 
-    public boolean isDone() {
+    public Boolean getDone() {
         return isDone;
     }
 
-    public void setDone(boolean done) {
+    public void setDone(Boolean done) {
         isDone = done;
     }
 }
